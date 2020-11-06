@@ -1,27 +1,28 @@
 let seconds = 0;
 let minutes = 0;
 let hours = 0;
-let displaySeconds;
-let displayMinutes;
-let displayHours;
-var dom = document.getElementById("displayTime");
+let interval;
+let state = "start";
+let displaySeconds, displayMinutes, displayHours;
+let dom = document.getElementById("displayTime");
+let startPause = document.getElementById("startButton");
 function stopWatch(){
     seconds++;
-    if(seconds / 60 === 1)  {
+    if(seconds / 60 === 1){
         seconds = 0;
         minutes++;
         if(minutes / 60 === 1){
             minutes = 0;
             hours++;
         }
-    }    
+    }
     if(seconds < 10){
         displaySeconds = "0" + seconds;
     } else {
         displaySeconds = seconds;
     }
     if(minutes < 10){
-        displayMinutes = "0" + minutes;
+        displayMinutes = "0" + minutes;        
     } else {
         displayMinutes = minutes;
     }
@@ -32,16 +33,30 @@ function stopWatch(){
     }
     dom.innerHTML = displayHours + ":" + displayMinutes + ":" + displaySeconds;
 }
-document.getElementById("startButton").addEventListener("click", () => {
-    var hey = window.setInterval(stopWatch, .1);
-    document.getElementById("pauseButton").addEventListener("click", () => {
-        clearInterval(hey);     
-    });
-    document.getElementById("resetButton").addEventListener("click", () => {
-        minutes = 0;
-        seconds = 0;
-        hours = 0;
-        dom.innerHTML = "00:00:00";
-        clearInterval(hey);        
-    });
+function begin(){
+    startPause.innerHTML = "Pause";
+    interval = setInterval(stopWatch, 1000);
+    state = "pause";
+}
+function end(){
+    startPause.innerHTML = "Start";
+    clearInterval(interval);
+    state = "start";
+}
+function beginEnd(){
+    if(state === "start"){
+        begin();
+    } else {
+        end();
+    }
+}
+startPause.addEventListener("click", () => {
+    beginEnd();
+});
+document.getElementById("resetButton").addEventListener("click", () => {
+    seconds = 0;
+    minutes = 0;
+    hours = 0;    
+    dom.innerHTML = "00:00:00";
+    end();
 });
