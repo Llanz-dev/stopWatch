@@ -1,62 +1,40 @@
-let seconds = 0;
-let minutes = 0;
-let hours = 0;
-let interval;
-let state = "start";
-let displaySeconds, displayMinutes, displayHours;
-let dom = document.getElementById("displayTime");
-let startPause = document.getElementById("startButton");
-function stopWatch(){
-    seconds++;
-    if(seconds / 60 === 1){
-        seconds = 0;
-        minutes++;
-        if(minutes / 60 === 1){
-            minutes = 0;
-            hours++;
-        }
-    }
-    if(seconds < 10){
-        displaySeconds = "0" + seconds;
-    } else {
-        displaySeconds = seconds;
-    }
-    if(minutes < 10){
-        displayMinutes = "0" + minutes;        
-    } else {
-        displayMinutes = minutes;
-    }
-    if(hours < 10){
-        displayHours = "0" + hours;
-    } else {
-        displayHours = hours;
-    }
-    dom.innerHTML = displayHours + ":" + displayMinutes + ":" + displaySeconds;
+//Set global variables;
+let stopwatch_timer = null, 
+    storedTime = 0, 
+    start = document.getElementById('startButton'), 
+    reset = document.getElementById('resetButton'), 
+    time = document.getElementById('displayTime');
+
+//Set functions
+function incrementTime(time, element) {
+    stopwatch_timer = setInterval(() => {
+        storedTime = time++;
+        element.innerHTML = watchFormat(storedTime);
+    },1000)
 }
-function begin(){
-    startPause.innerHTML = "Pause";
-    interval = setInterval(stopWatch, 1000);
-    state = "pause";
+
+function watchFormat(increment){
+    return new Date(1000 * increment).toISOString().substr(11, 8);
 }
-function end(){
-    startPause.innerHTML = "Start";
-    clearInterval(interval);
-    state = "start";
+
+function clearTime(timer, element){
+    clearInterval(timer);
+    element.innerHTML = "00:00:00";
 }
-function beginEnd(){
-    if(state === "start"){
-        begin();
-    } else {
-        end();
-    }
-}
-startPause.addEventListener("click", () => {
-    beginEnd();
+
+//When button is click
+start.addEventListener('click', () => {
+   if(start.innerHTML == 'Start'){
+       start.innerHTML = 'Pause';
+       incrementTime(storedTime, time)
+   } else {
+       start.innerHTML = 'Start';
+       clearInterval(stopwatch_timer)
+   }
 });
-document.getElementById("resetButton").addEventListener("click", () => {
-    seconds = 0;
-    minutes = 0;
-    hours = 0;    
-    dom.innerHTML = "00:00:00";
-    end();
+
+reset.addEventListener('click', () => {
+    if(start.innerHTML == "Pause") start.innerHTML = "Start";
+    storedTime = 0;
+    clearTime(stopwatch_timer, time)
 });
